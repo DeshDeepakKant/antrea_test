@@ -84,6 +84,7 @@ import (
 	"antrea.io/antrea/pkg/ovs/ovsctl"
 	"antrea.io/antrea/pkg/signals"
 	"antrea.io/antrea/pkg/util/channel"
+	"antrea.io/antrea/pkg/util/env"
 	"antrea.io/antrea/pkg/util/k8s"
 	"antrea.io/antrea/pkg/util/lazy"
 	"antrea.io/antrea/pkg/util/podstore"
