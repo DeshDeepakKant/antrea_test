@@ -1,0 +1,29 @@
+ARG GO_VERSION=1.23
+ARG BUILD_TAG=antrea-v2.3
+
+FROM golang:${GO_VERSION} AS antrea-build
+
+WORKDIR /antrea
+
+COPY go.mod go.sum ./
+RUN go mod download && go mod verify
+
+COPY . .
+
+RUN mkdir -p bin && \
+    GOOS=linux go build -o bin/antctl-linux antrea.io/antrea/cmd/antctl && \
+    mv bin/antctl-linux bin/antctl && \
+    GOOS=linux go build -o bin/antrea-agent antrea.io/antrea/cmd/antrea-agent && \
+    GOOS=linux go build -o bin/antrea-cni antrea.io/antrea/cmd/antrea-cni
+
+FROM antrea/base-ubuntu-amd64:${BUILD_TAG}
+
+LABEL maintainer="Antrea <projectantrea-dev@googlegroups.com>"
+LABEL description="The Docker image to deploy the antrea-agent."
+
+USER root
+
+COPY build/images/scripts/* /usr/local/bin/
+COPY --from=antrea-build /antrea/bin/antrea-agent /usr/local/bin/
+COPY --from=antrea-build /antrea/bin/antrea-cni /usr/local/bin/
+COPY --from=antrea-build /antrea/bin/antctl /usr/local/bin/

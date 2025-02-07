@@ -1,0 +1,16 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: controller
+  namespace: system
+spec:
+  template:
+    spec:
+      containers:
+        - command: [ "/run_cov_binary.sh" ]
+          args:
+          - /antrea-mc-controller-coverage
+          - leader
+          - --config=/controller_manager_config.yaml
+          name: antrea-mc-controller
+          image: antrea/antrea-mc-controller-coverage:latest
